@@ -577,9 +577,11 @@ if(!$arParams["CAN_EDIT"])
 /*echo 'before';*/
 /* ПОКАЗЫВАТЬ ТОЛЬКО ВКЛАДКУ - ДОКУМЕНТ*/
 $arTabsTmp[] = $arTabs[0];
-echo '$arTabs<pre>';
+
+/*echo '$arTabs<pre>';
 print_r($arTabsTmp);
-echo '</pre>';
+echo '</pre>';*/
+
 /*ДЛЯ АДМИНА ДОБАВЛЯЕМ ПОЛЬЗОВАТЕЛЕЙ КОТОРЫМ БУДЕМ ПОКАЗЫВАТЬ СОЗДАННЫЙ ДОКУМЕНТ*/
 if($arParams["USER_TYPE"] == "worker" || $arParams["USER_TYPE"] == "admin"){
 	/*ФОРМИРУЕМ CHECKBOX - БЛОКИРОВАНИЕ ДЕЙСТВИЙ ПОЛЬЗОВАТЕЛЯ НА ИЗМЕНЕНИЕ ДОКУМЕНТА*/

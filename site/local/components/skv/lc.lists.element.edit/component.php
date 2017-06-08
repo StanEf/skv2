@@ -271,9 +271,10 @@ $arResult["ELEMENT"] = $rsElement->GetNextElement();
 
 $arResult["DOCUMENT_CREATOR"] = $arResult["ELEMENT"]->fields["CREATED_BY"];
 
-echo __LINE__ . ' $arResult["ELEMENT"] <pre>';
+/*echo __LINE__ . ' $arResult["ELEMENT"] <pre>';
 print_r($arResult["ELEMENT"]);
-echo '</pre>';
+echo '</pre>';*/
+
 if(is_object($arResult["ELEMENT"]))
 	$arResult["ELEMENT_FIELDS"] = $arResult["ELEMENT"]->GetFields();
 else
@@ -410,10 +411,12 @@ if($arParams["USER_TYPE"] == "user"){
         $arResult["DOCUMENT_EDIT_AVAILABLE"] = $row["EDIT"];
     }
 
-    echo __LINE__ . ' $arResult["DOCUMENT_EDIT_AVAILABLE"] <pre>';
+/*    echo __LINE__ . ' $arResult["DOCUMENT_EDIT_AVAILABLE"] <pre>';
     print_r($arResult["DOCUMENT_EDIT_AVAILABLE"]);
     echo '</pre>';
-    if(empty($arResult["DOCUMENT_EDIT_AVAILABLE"]) || $arResult["DOCUMENT_CREATOR"] != $current_user_id){
+    echo '$arResult["DOCUMENT_CREATOR"] ' . $arResult["DOCUMENT_CREATOR"] . '$current_user_id ' . $current_user_id;*/
+
+    if(empty($arResult["DOCUMENT_EDIT_AVAILABLE"]) && $arResult["DOCUMENT_CREATOR"] != $current_user_id){
         exit("У Вас нет доступа к данному документу.");
     }
 }
@@ -1284,7 +1287,7 @@ while ($row = $obUsers->fetch())
 	$rows[] = $row["USER_ID"];
 	$user_edit_rights = $row["EDIT"];
 }
-echo '$user_edit_rights  ' .$user_edit_rights .'<br>';
+//echo '$user_edit_rights  ' .$user_edit_rights .'<br>';
 $arResult["USER_EDIT_RIGHTS"] = $user_edit_rights;
 //echo '$arResult["USER_EDIT_RIGHTS"] ' . $arResult["USER_EDIT_RIGHTS"];
 $arResult["DOCUMENT_USERS"] = implode(",", $rows);

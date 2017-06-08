@@ -784,9 +784,9 @@ if($arParams["USER_TYPE"] == "user"){
 
 	while ($row = $obUsers->fetch())
 	{
-        echo __LINE__ . ' $row <pre>';
+       /* echo __LINE__ . ' $row <pre>';
         print_r($row);
-        echo '</pre>';
+        echo '</pre>';*/
 		$availableDocuments[$row["DOCUMENT_ID"]] = $row["EDIT"];
 		//$tmp = $row["DOCUMENT_ID"];
         //$documents[] = $row["DOCUMENT_ID"];
