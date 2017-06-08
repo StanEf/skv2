@@ -223,8 +223,6 @@ $arResult["COPY_ID"] = $copy_id;
 $obList = new CList($arIBlock["ID"]);
 
 $arResult["FIELDS"] = $obList->GetFields();
-//$arResult["FIELDS"]["PROPERTY_235"]
-
 
 // ВЫСТАВЛЯЕМ НЕИЗМЕНЯЕМОСТЬ OBJECT_ID В ФОРМАХ ДОБАВЛЕНИЯ, ИЗМЕНЕНИЯ ДОКУМЕНТОВ
 foreach($arResult["FIELDS"] as $FIELD_ID => $arField)
@@ -241,7 +239,7 @@ echo '</pre>';*/
 if($bBizproc)
 	$arSelect = array("ID", "IBLOCK_ID", "NAME", "IBLOCK_SECTION_ID", "CREATED_BY", "BP_PUBLISHED");
 else
-	$arSelect = array("ID", "IBLOCK_ID", "NAME", "IBLOCK_SECTION_ID");
+	$arSelect = array("ID", "IBLOCK_ID", "NAME", "IBLOCK_SECTION_ID", "CREATED_BY");
 
 $arProps = array();
 foreach($arResult["FIELDS"] as $FIELD_ID => $arField)
@@ -271,6 +269,11 @@ $rsElement = CIBlockElement::GetList(
 );
 $arResult["ELEMENT"] = $rsElement->GetNextElement();
 
+$arResult["DOCUMENT_CREATOR"] = $arResult["ELEMENT"]->fields["CREATED_BY"];
+
+echo __LINE__ . ' $arResult["ELEMENT"] <pre>';
+print_r($arResult["ELEMENT"]);
+echo '</pre>';
 if(is_object($arResult["ELEMENT"]))
 	$arResult["ELEMENT_FIELDS"] = $arResult["ELEMENT"]->GetFields();
 else
@@ -392,6 +395,29 @@ if(!empty($arResult["EXTERNAL_CONTEXT"]))
 	}
 }
 
+/*ПРАВА НА ДОКУМЕНТЫ У ПОЛЬЗОВАТЕЛЯ */
+if($arParams["USER_TYPE"] == "user"){
+    $current_user_id = $USER->GetID();
+    /*ПОЛУЧАЕМ ПРАВО ПОЛЬЗОВАТЕЛЯ НА ИЗМЕНЕНИЕ ДОКУМЕНТА*/
+    $obUsers = DocumentUserTable::GetList(array(
+        'select' => array('*'),
+        'filter' => array('=USER_ID' => $current_user_id,
+                        '=DOCUMENT_ID' => $arParams["ELEMENT_ID"]
+        ),
+    ));
+    while ($row = $obUsers->fetch())
+    {
+        $arResult["DOCUMENT_EDIT_AVAILABLE"] = $row["EDIT"];
+    }
+
+    echo __LINE__ . ' $arResult["DOCUMENT_EDIT_AVAILABLE"] <pre>';
+    print_r($arResult["DOCUMENT_EDIT_AVAILABLE"]);
+    echo '</pre>';
+    if(empty($arResult["DOCUMENT_EDIT_AVAILABLE"]) || $arResult["DOCUMENT_CREATOR"] != $current_user_id){
+        exit("У Вас нет доступа к данному документу.");
+    }
+}
+
 //Form submitted
 if(
 	$_SERVER["REQUEST_METHOD"] == "POST"
@@ -406,6 +432,10 @@ if(
 			CIBlockElementRights::UserHasRightTo($IBLOCK_ID, $ELEMENT_ID, "element_bizproc_start")
 		)*/
 	)
+    && (
+        // ИЗМЕНЯТЬ ФОРМУ МОЖЕТ ТОЛЬКО АДМИН, СОЗДАТЕЛЬ И ПРОСТОЙ ПОЛЬЗОВАТЕЛЬ С ПРАВАМИ НА ИЗМЕНЕНИЕ
+        $arParams["USER_TYPE"] == "admin" || $arResult["DOCUMENT_EDIT_AVAILABLE"] == "Y" || $arResult["DOCUMENT_CREATOR"] == $USER->GetID()
+    )
 )
 {
 
@@ -757,7 +787,7 @@ if(
 				}
 			}
 		}
-
+echo '22';
 		if(!$strError)
 		{
 			$obElement = new CIBlockElement;
@@ -773,15 +803,19 @@ if(
 				if(!$res) {
 					$strError = $obElement->LAST_ERROR;
 				}
-
+/*echo __LINE__ . ' $_POST <pre>';
+print_r($_POST);
+echo '</pre>';*/
 				/*ДОСТУП ПОЛЬЗОВАТЕЛЯ К РЕДАКТИРОВАНИЮ ФАЙЛА*/
-				if(isset($_POST["USER_EDIT_RIGHTS"])){
-					$user_edit_rights = "Y";
-				}else{
-					$user_edit_rights = "N";
-				}
 
-echo '$user_edit_rights ' . $user_edit_rights . '<br>';
+				if(isset($_POST["USER_EDIT_RIGHTS"])){
+				    /*ГАЛОЧКА СТОИТ СЛЕДОВАТЕЛЬНО ТОЛЬКО ПРОСМОТР*/
+					$user_edit_rights = "N";
+				}else{
+					$user_edit_rights = "Y";
+				}
+//exit('$user_edit_rights '.$user_edit_rights);
+//echo '$user_edit_rights ' . $user_edit_rights . '<br>';
 
 
 				/*ЗАПОМИНАЕМ ПОЛЬЗОВАТЕЛЕЙ КОТОРЫМ ДОСТУПЕН ДОКУМЕНТ СОЗДАННЫЙ СОТРУДНИКОМ */
@@ -1250,7 +1284,7 @@ while ($row = $obUsers->fetch())
 	$rows[] = $row["USER_ID"];
 	$user_edit_rights = $row["EDIT"];
 }
-
+echo '$user_edit_rights  ' .$user_edit_rights .'<br>';
 $arResult["USER_EDIT_RIGHTS"] = $user_edit_rights;
 //echo '$arResult["USER_EDIT_RIGHTS"] ' . $arResult["USER_EDIT_RIGHTS"];
 $arResult["DOCUMENT_USERS"] = implode(",", $rows);

@@ -197,9 +197,9 @@ class LcOrmObjectEdit extends CBitrixComponent
 		//echo "this->object_id" .$this->object_id;
 		$this->arResult["USERS"] = ObjectUserTable::getUsers($this->object_id);
 
-/*		echo '$this->arResult["USERS"]<pre>';
+		echo '$this->arResult["USERS"]<pre>';
 		print_r($this->arResult["USERS"]);
-		echo '</pre>';*/
+		echo '</pre>';
 	}
 
 	public function executeComponent()

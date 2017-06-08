@@ -7,6 +7,9 @@ if (!$USER->IsAuthorized() && $_SERVER['REMOTE_USER']==''){
 	die();
 }
 $user_groups = $USER->GetUserGroupArray();
+echo __LINE__ . ' $user_groups <pre>';
+print_r($user_groups);
+echo '</pre>';
 //1-администраторы
 //12 - сотрудники скв
 //20 - пользователи лк

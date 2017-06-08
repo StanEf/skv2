@@ -297,7 +297,12 @@ endforeach;
 			print_r($arParams["DOCUMENT_USERS"]);
 			echo '</pre>';
 			*/?>
-			<?$GLOBALS["APPLICATION"]->IncludeComponent('skv:lc.intranet.user.selector.new', '', array(
+			<?
+            
+/*            echo __LINE__ . ' $arParams["DOCUMENT_USERS"] <pre>';
+            print_r($arParams["DOCUMENT_USERS"]);
+            echo '</pre>';*/
+            $GLOBALS["APPLICATION"]->IncludeComponent('skv:lc.intranet.user.selector.new', '', array(
 					"FORM_NAME" => "document_form_edit",
 					"MULTIPLE" => "Y",
 					"NAME" => "USERS_DOCUMENTS",
@@ -363,13 +368,21 @@ endforeach;
 
 <?
 if(isset($arParams["BUTTONS"])):
+    if($arParams["USER_TYPE"] == "admin" || $arParams["DOCUMENT_EDIT_AVAILABLE"] == "Y" || $arParams["DOCUMENT_CREATOR"] == $USER->GetID()){
+        $disabled = '';
+    }else{
+        $disabled = 'disabled';
+    }
+
+
+
 ?>
 			<div class="bx-buttons">
 <?if($arParams["~BUTTONS"]["standard_buttons"] !== false):?>
 	<?if($arParams["BUTTONS"]["back_url"] <> ''):?>
-	<input type="submit" name="save" value="<?echo GetMessage("interface_form_save")?>" title="<?echo GetMessage("interface_form_save_title")?>" />
+	<input type="submit" name="save" value="<?echo GetMessage("interface_form_save")?>" title="<?echo GetMessage("interface_form_save_title")?>" <?=$disabled?>/>
 	<?endif?>
-	<input type="submit" name="apply" value="<?echo GetMessage("interface_form_apply")?>" title="<?echo GetMessage("interface_form_apply_title")?>" />
+	<input type="submit" name="apply" value="<?echo GetMessage("interface_form_apply")?>" title="<?echo GetMessage("interface_form_apply_title")?>" <?=$disabled?>/>
 	<?if($arParams["BUTTONS"]["back_url"] <> ''):?>
 	<input type="button" value="<?echo GetMessage("interface_form_cancel")?>" name="cancel" onclick="window.location='<?=htmlspecialcharsbx(CUtil::addslashes($arParams["~BUTTONS"]["back_url"]))?>'" title="<?echo GetMessage("interface_form_cancel_title")?>" />
 	<?endif?>

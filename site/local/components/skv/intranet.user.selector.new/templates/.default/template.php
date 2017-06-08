@@ -1,12 +1,8 @@
 <?
-
 if(!Defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 $APPLICATION->AddHeadScript('/bitrix/components/bitrix/intranet.user.selector.new/templates/.default/users.js');
 
-/*echo '($arParams<pre>';
-print_r($arParams);
-echo '</pre>';*/
 $ajaxUrl = $this->__component->GetPath() . '/ajax.php?' .
 	http_build_query(
 		array(
@@ -77,7 +73,11 @@ $ajaxUrl = $this->__component->GetPath() . '/ajax.php?' .
 				<?php endif?>
 				<?php if($arParams["DISPLAY_TABS"] == 'Y'): ?>
 					<div class="finder-box-tabs">
-
+						<span class="finder-box-tab finder-box-tab-selected" id="<?php echo $arResult["NAME"]?>_tab_last" onclick="O_<?php echo $arResult["NAME"]?>.displayTab('last');">
+							<span class="finder-box-tab-left"></span>
+							<span class="finder-box-tab-text"><?php echo GetMessage("INTRANET_LAST_SELECTED")?></span>
+							<span class="finder-box-tab-right"></span>
+						</span>
 						<?php if($arParams["DISPLAY_TAB_STRUCTURE"] == 'Y'): ?>
 						<span class="finder-box-tab" id="<?php echo $arResult["NAME"]?>_tab_structure" onclick="O_<?php echo $arResult["NAME"]?>.displayTab('structure');">
 							<span class="finder-box-tab-left"></span>
@@ -85,19 +85,65 @@ $ajaxUrl = $this->__component->GetPath() . '/ajax.php?' .
 							<span class="finder-box-tab-right"></span>
 						</span>
 						<?php endif; ?>
-						<?php if($arParams["DISPLAY_TAB_OBJECT_USERS"] == 'Y'): ?>
+						<?php if($arParams["DISPLAY_TAB_GROUP"] == 'Y'): ?>
 						<span class="finder-box-tab" id="<?php echo $arResult["NAME"]?>_tab_groups" onclick="O_<?php echo $arResult["NAME"]?>.displayTab('groups');">
 							<span class="finder-box-tab-left"></span>
-							<span class="finder-box-tab-text">Пользователи объекта</span>
+							<span class="finder-box-tab-text"><?php echo GetMessage('INTRANET_TAB_USER_GROUPS'); ?></span>
 							<span class="finder-box-tab-right"></span>
 						</span>
 						<?php endif; ?>
+						<span class="finder-box-tab" id="<?php echo $arResult["NAME"]?>_tab_search" onclick="O_<?php echo $arResult["NAME"]?>.displayTab('search'), O_<?php echo $arResult["NAME"]?>.searchInput.focus();">
+							<span class="finder-box-tab-left"></span>
+							<span class="finder-box-tab-text"><?php echo GetMessage("INTRANET_USER_SEARCH")?></span>
+							<span class="finder-box-tab-right"></span>
+						</span>
 					</div>
 
 					<div class="popup-window-hr popup-window-buttons-hr"><i></i></div>
 				<?php endif?>
 				<div class="finder-box-tabs-content">
+					<?php if($arParams["SHOW_STRUCTURE_ONLY"] != 'Y'): ?>
+						<div class="finder-box-tab-content finder-box-tab-content-selected" id="<?php echo $arResult["NAME"]?>_last">
+							<table class="finder-box-tab-columns" cellspacing="0">
+								<tr>
+									<td>
+										<?php $i = 0;?>
+										<?php foreach($arResult["LAST_USERS"] as $key=>$user):?>
+											<?php $anchor_id = RandString(16); ?>
+											<div class="finder-box-item<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " finder-box-item-selected" : "")?>" id="<?php echo $arResult["NAME"]?>_last_employee_<?php echo $user["ID"]?>" onclick="O_<?php echo $arResult["NAME"]?>.select(event)">
+												<?php if ($arParams["MULTIPLE"] == "Y"):?>
+													<input type="checkbox" name="<?php echo $arResult["NAME"]?>[]" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
+												<?php else:?>
+													<input type="radio" name="<?php echo $arResult["NAME"]?>" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
+												<?php endif?>
+												<div class="finder-box-item-text" id="anchor_created_<?php echo $anchor_id; ?>"><?php echo $user["NAME"]?></div>
+												<div class="finder-box-item-icon"></div>
+											</div>
+											<?php if ($i == ceil(sizeof($arResult["LAST_USERS"]) / 2) - 1):?>
+											</td><td>
+											<?php endif?>
 
+											<script>
+											BX.tooltip(<?php echo $user["ID"]; ?>, "anchor_created_<?php echo $anchor_id; ?>", "", 'intrantet-user-selector-tooltip');
+											</script>
+
+
+											<?php $i++;?>
+										<?php endforeach?>
+										<?php foreach($arResult["CURRENT_USERS"] as $key=>$user):?>
+											<?php if (!in_array($user, $arResult["LAST_USERS"])):?>
+												<?php if ($arParams["MULTIPLE"] == "Y"):?>
+													<input type="checkbox" name="<?php echo $arResult["NAME"]?>[]" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
+												<?php else:?>
+													<input type="radio" name="<?php echo $arResult["NAME"]?>" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
+												<?php endif?>
+											<?php endif?>
+										<?php endforeach?>
+									</td>
+								</tr>
+							</table>
+						</div>
+					<?php endif?>
 					<?php if($arParams["DISPLAY_TAB_STRUCTURE"] == 'Y'): ?>
 					<div class="finder-box-tab-content<?=($arParams["SHOW_STRUCTURE_ONLY"] == 'Y' ? ' finder-box-tab-content-selected' : '')?>" id="<?php echo $arResult["NAME"]?>_structure">
 						<div class="company-structure">
@@ -105,76 +151,19 @@ $ajaxUrl = $this->__component->GetPath() . '/ajax.php?' .
 						</div>
 					</div>
 					<?php endif; ?>
-					
-					<?php if($arParams["DISPLAY_TAB_OBJECT_USERS"] == 'Y'): ?>
-					<div class="finder-box-tab-content finder-box-tab-content-selected" id="<?php echo $arResult["NAME"]?>_groups">
-						<?php $i = 0;?>
-						<?php foreach($arResult["DISPLAY_TAB_OBJECT_USERS"] as $key=>$user):?>
-							<?php $anchor_id = RandString(16); ?>
-							<div class="finder-box-item<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " finder-box-item-selected" : "")?>" id="<?php echo $arResult["NAME"]?>_last_employee_<?php echo $user["ID"]?>" onclick="O_<?php echo $arResult["NAME"]?>.select(event)">
-								<?php if ($arParams["MULTIPLE"] == "Y"):?>
-									<input type="checkbox" name="<?php echo $arResult["NAME"]?>[]" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
-								<?php else:?>
-									<input type="radio" name="<?php echo $arResult["NAME"]?>" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
-								<?php endif?>
-								<div class="finder-box-item-text" id="anchor_created_<?php echo $anchor_id; ?>"><?php echo $user["NAME"]?></div>
-								<div class="finder-box-item-icon"></div>
-							</div>
-							<?php if ($i == ceil(sizeof($arResult["LAST_USERS"]) / 2) - 1):?>
-							</td><td>
-							<?php endif?>
-
-							<script>
-							BX.tooltip(<?php echo $user["ID"]; ?>, "anchor_created_<?php echo $anchor_id; ?>", "", 'intrantet-user-selector-tooltip');
-							</script>
-
-
-							<?php $i++;?>
-						<?php endforeach?>
-						<?php foreach($arResult["CURRENT_USERS"] as $key=>$user):?>
-							<?php if (!in_array($user, $arResult["LAST_USERS"])):?>
-								<?php if ($arParams["MULTIPLE"] == "Y"):?>
-									<input type="checkbox" name="<?php echo $arResult["NAME"]?>[]" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
-								<?php else:?>
-									<input type="radio" name="<?php echo $arResult["NAME"]?>" value="<?php echo $user["ID"]?>"<?php echo (in_array($user["ID"], $arParams["VALUE"]) ? " checked" : "")?> class="intranet-hidden-input" />
-								<?php endif?>
-							<?php endif?>
-						<?php endforeach?>
+					<?php if($arParams["DISPLAY_TAB_GROUP"] == 'Y'): ?>
+					<div class="finder-box-tab-content" id="<?php echo $arResult["NAME"]?>_groups">
+						<?php
+							CIntranetUserSelectorHelper::drawGroup($arResult["GROUPS"], $arResult["NAME"]);
+						?>
 					</div>
 					<?php endif; ?>
+					<div class="finder-box-tab-content" id="<?php echo $arResult["NAME"]?>_search"></div>
 				</div>
 			</td>
-
-			<!--<div class="finder-box-selected-items">
-				<div class="finder-box-selected-item" id="USERS_DOCUMENTS_employee_selected_25">
-				    <div class="finder-box-selected-item-icon" id="USERS_DOCUMENTS-user-selector-unselect-25" onclick="O_USERS_DOCUMENTS.unselect(25, this);">
-                    </div>
-                    <span class="finder-box-selected-item-text">Пенз</span>
-                </div>
-				<div id="USERS_DOCUMENTS_employee_selected_1" class="finder-box-selected-item">
-				    <div class="finder-box-selected-item-icon" id="USERS_DOCUMENTS-user-selector-unselect-1" onclick="O_USERS_DOCUMENTS.unselect(1, this);">
-                    </div>
-                    <span class="finder-box-selected-item-text">Илья</span>
-                </div>
-            </div>
---><?
-/*echo __LINE__ . ' $arResult["CURRENT_USERS"] <pre>';
-print_r($arResult);
-echo '</pre>';*/
-
- ?>
-
 			<?php if ($arParams["MULTIPLE"] == "Y"):?>
 			<td class="finder-box-right-column" id="<?=$arResult["NAME"]; ?>_selected_users">
-				<div class="finder-box-selected-title"><?=GetMessage("INTRANET_EMP_CURRENT_COUNT");?>
-				    (<span id="<?=$arResult["NAME"]; ?>_current_count">
-                    <?if(empty($arResult["CURRENT_USERS"])){
-                        echo "0";
-                    }else{
-                        echo sizeof($arResult["CURRENT_USERS"]);
-                    }?>
-                    </span>)
-                </div>
+				<div class="finder-box-selected-title"><?=GetMessage("INTRANET_EMP_CURRENT_COUNT"); ?> (<span id="<?=$arResult["NAME"]; ?>_current_count"><?=sizeof($arResult["CURRENT_USERS"]); ?></span>)</div>
 				<div class="finder-box-selected-items">
 					<? foreach($arResult["CURRENT_USERS"] as $user) { ?>
 						<div

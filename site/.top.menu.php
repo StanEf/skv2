@@ -27,6 +27,13 @@ $aMenuLinks = Array(
 		Array(), 
 		Array(), 
 		"" 
-	)
+	),
+    Array(
+        "Поддержка",
+        "/support/",
+        Array(),
+        Array(),
+        ""
+    )
 );
 ?>

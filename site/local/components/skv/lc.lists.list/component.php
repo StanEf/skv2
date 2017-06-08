@@ -741,8 +741,6 @@ if($arParams["CAN_EDIT"])
 // print_r($arSelect);
 // echo '</pre>';
 	/** @var CIBlockResult $rsElements */
-//$arFilter["OBJECT_ID"] = $arParams["OBJECT_ID"];	
-
 
 $user_groups = CUser::GetUserGroup($_SESSION['SESS_AUTH']['USER_ID']);
 
@@ -771,7 +769,10 @@ if($arParams["USER_TYPE"] == "user"){
 	print_r($arResult["ELEMENTS_ROWS"]);
 	echo '</pre>';*/
 
-	/*ПОЛУЧАЕМ ВСЕ ДОКУМЕНТЫ К КОТОРЫМ ИМЕЕТ ДОСТУП ПОЛЬЗОВАТЕЛЬ*/
+	/*ПОЛУЧАЕМ ВСЕ ДОКУМЕНТЫ ОБЪЕКТА К КОТОРЫМ ИМЕЕТ ДОСТУП ПОЛЬЗОВАТЕЛЬ*/
+
+
+
 
 	$obUsers = DocumentUserTable::GetList(array(
 		'select' => array('*'),
@@ -779,12 +780,25 @@ if($arParams["USER_TYPE"] == "user"){
 		),
 	));
 
+
+
 	while ($row = $obUsers->fetch())
 	{
-		$availableDocuments[$row["DOCUMENT_ID"]] = 1;
+        echo __LINE__ . ' $row <pre>';
+        print_r($row);
+        echo '</pre>';
+		$availableDocuments[$row["DOCUMENT_ID"]] = $row["EDIT"];
 		//$tmp = $row["DOCUMENT_ID"];
+        //$documents[] = $row["DOCUMENT_ID"];
 	}
 
+    /*$arFilter = array(
+        array("LOGIC" => "OR",
+                array("=ID" => '1'),
+            )
+    );*/
+    //$arFilter["@ID"] = implode(",", $documents);
+    //$arFilter["@ID"] = $documents;
 }
 
 
@@ -813,16 +827,16 @@ else
 
 $check = false;
 $listValues = array();
-/*echo __LINE__ . ' $availableDocuments<pre>';
-print_r($availableDocuments);
+/*echo __LINE__ . ' $rsElements<pre>';
+print_r($rsElements);
 echo '</pre>';*/
 while($obElement = $rsElements->GetNextElement())
 {
 	$check = true;
 	$columns = array();
 	$data = $obElement->GetFields();
-/*	echo __LINE__ . ' $data<pre>';
-	print_r($data);
+	/*echo __LINE__ . ' $obElement<pre>';
+	print_r($obElement);
 	echo '</pre>';*/
 	if(!is_array($data))
 		continue;
@@ -834,6 +848,7 @@ while($obElement = $rsElements->GetNextElement())
 
 	if($arParams["USER_TYPE"] == "user"){
 		if(!isset($availableDocuments[$data["ID"]]) && $data["CREATED_BY"] !=  $current_user_id){
+		    //unset($rsElements["arResult"]);
 			continue;
 		}
 	}
@@ -1036,7 +1051,10 @@ while($obElement = $rsElements->GetNextElement())
 	$aActions = array();
 	if(!$arResult["IS_SOCNET_GROUP_CLOSED"]
 		&& ($lists_perm >= CListPermissions::CAN_WRITE
-			|| CIBlockElementRights::UserHasRightTo($IBLOCK_ID, $data["~ID"], "element_edit")))
+			|| CIBlockElementRights::UserHasRightTo($IBLOCK_ID, $data["~ID"], "element_edit"))
+        && ( $arParams["USER_TYPE"] == "admin" || $availableDocuments[$data["ID"]] == "Y" )
+
+    )
 	{
 		$aActions[] = array(
 			"TEXT" => GetMessage("CC_BLL_ELEMENT_ACTION_MENU_EDIT"),
@@ -1185,8 +1203,10 @@ while($obElement = $rsElements->GetNextElement())
 		}
 	}
 
-	if(!$arResult["IS_SOCNET_GROUP_CLOSED"] && ($lists_perm >= CListPermissions::CAN_WRITE
-			|| CIBlockElementRights::UserHasRightTo($IBLOCK_ID, $data["~ID"], "element_delete")))
+	if(!$arResult["IS_SOCNET_GROUP_CLOSED"]
+        && ($lists_perm >= CListPermissions::CAN_WRITE || CIBlockElementRights::UserHasRightTo($IBLOCK_ID, $data["~ID"], "element_delete"))
+        && ( $arParams["USER_TYPE"] == "admin" || $data["CREATED_BY"] == $current_user_id )
+    )
 	{
 		$aActions[] = array(
 			"TEXT" => GetMessage("CC_BLL_ELEMENT_ACTION_MENU_DELETE"),
@@ -1202,6 +1222,23 @@ while($obElement = $rsElements->GetNextElement())
 		"columns" => $columns,
 	);
 }
+foreach($rsElements->arResult as $key => $data){
+    if($arParams["USER_TYPE"] == "user"){
+        if(!isset($availableDocuments[$data["ID"]]) && $data["CREATED_BY"] !=  $current_user_id){
+            unset($rsElements->arResult[$key]);
+            //continue;
+        }
+    }
+}
+$documents_count = count($rsElements->arResult);
+$rsElements->NavRecordCount = $documents_count;
+$rsElements->nSelectedCount = $documents_count;
+
+
+
+/*echo __LINE__ . ' $arResult["ELEMENTS_ROWS"] <pre>';
+print_r($arResult["ELEMENTS_ROWS"]);
+echo '</pre>';*/
 
 if(!$arResult["CAN_READ"] && $check)
 	$arResult["CAN_READ"] = true;

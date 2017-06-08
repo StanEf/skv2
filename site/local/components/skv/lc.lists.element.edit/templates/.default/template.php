@@ -577,13 +577,13 @@ if(!$arParams["CAN_EDIT"])
 /*echo 'before';*/
 /* ПОКАЗЫВАТЬ ТОЛЬКО ВКЛАДКУ - ДОКУМЕНТ*/
 $arTabsTmp[] = $arTabs[0];
-/*echo '$arTabs<pre>';
+echo '$arTabs<pre>';
 print_r($arTabsTmp);
-echo '</pre>';*/
+echo '</pre>';
 /*ДЛЯ АДМИНА ДОБАВЛЯЕМ ПОЛЬЗОВАТЕЛЕЙ КОТОРЫМ БУДЕМ ПОКАЗЫВАТЬ СОЗДАННЫЙ ДОКУМЕНТ*/
 if($arParams["USER_TYPE"] == "worker" || $arParams["USER_TYPE"] == "admin"){
 	/*ФОРМИРУЕМ CHECKBOX - БЛОКИРОВАНИЕ ДЕЙСТВИЙ ПОЛЬЗОВАТЕЛЯ НА ИЗМЕНЕНИЕ ДОКУМЕНТА*/
-	if($arResult["USER_EDIT_RIGHTS"] == "Y"){
+	if($arResult["USER_EDIT_RIGHTS"] == "N"){
 		$checkboxUserShowRights = "checked";
 	}else{
 		$checkboxUserShowRights = "";
@@ -611,7 +611,12 @@ if($arParams["USER_TYPE"] == "worker" || $arParams["USER_TYPE"] == "admin"){
 	$arTabsTmp[0]["fields"][] = $arUserShowRights;
 }
 //$arTabsTmp[0]["fields"]
-
+/*echo __LINE__ . '$arResult["FORM_DATA"]  <pre>';
+print_r($arResult["FORM_DATA"]);
+echo '</pre>';*/
+/*echo __LINE__ . '$arTabsTmp  <pre>';
+print_r($arTabsTmp);
+echo '</pre>';*/
 $APPLICATION->IncludeComponent(
 	"bitrix:main.interface.form",
 	"skv",
@@ -631,6 +636,8 @@ $APPLICATION->IncludeComponent(
 		"USER_TYPE" => $arParams["USER_TYPE"],
 		"ELEMENT_ID" => $arParams["ELEMENT_ID"],
 		"DOCUMENT_USERS" => $arResult["DOCUMENT_USERS"],
+        "DOCUMENT_EDIT_AVAILABLE" => $arResult["DOCUMENT_EDIT_AVAILABLE"],
+        "DOCUMENT_CREATOR" => $arResult["DOCUMENT_CREATOR"],
 	),
 	$component, array("HIDE_ICONS" => "Y")
 );

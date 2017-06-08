@@ -119,7 +119,7 @@ if ($arResult != null) {?>
 print_r($arResult["USERS"]);
 echo '</pre>';*/
 
-							$GLOBALS["APPLICATION"]->IncludeComponent('bitrix:intranet.user.selector.new', '', array(
+							$GLOBALS["APPLICATION"]->IncludeComponent('skv:intranet.user.selector.new', '', array(
 							"FORM_NAME" => "object_form_edit",
 							/*'INPUT_NAME' => "USER_SEARCH_INPUT",*/
 							"MULTIPLE" => "Y",

@@ -269,13 +269,13 @@ echo '</pre>';*/
 
 <?
 // --------------------------------------------------------------
-/*$new_doc_root = str_replace("/", "\\", $_SERVER["DOCUMENT_ROOT"]);
+$new_doc_root = str_replace("/", "\\", $_SERVER["DOCUMENT_ROOT"]);
 $ar_new_doc_root = explode("/", $_SERVER["DOCUMENT_ROOT"]);
 array_pop($ar_new_doc_root);
 $new_doc_root = implode("\\", $ar_new_doc_root);
 $file_path = str_replace($new_doc_root, "", __FILE__);
-echo '(' . __LINE__ . ') ' . $file_path . '<br/> $arResult["NAV_OBJECT"] <pre>';
-print_r($arResult["NAV_OBJECT"]);
+/*echo '(' . __LINE__ . ') ' . $file_path . '<br/> $arResult["ELEMENTS_ROWS"] <pre>';
+print_r($arResult["ELEMENTS_ROWS"]);
 echo '</pre>';*/
 // --------------------------------------------------------------
 
