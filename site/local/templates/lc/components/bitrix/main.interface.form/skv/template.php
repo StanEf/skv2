@@ -368,7 +368,7 @@ endforeach;
 
 <?
 if(isset($arParams["BUTTONS"])):
-    if($arParams["USER_TYPE"] == "admin" || $arParams["DOCUMENT_EDIT_AVAILABLE"] == "Y" || $arParams["DOCUMENT_CREATOR"] == $USER->GetID()){
+    if($arParams["USER_TYPE"] == "admin" || $arParams["DOCUMENT_EDIT_AVAILABLE"] == "Y" || $arParams["DOCUMENT_CREATOR"] == $USER->GetID() || $arParams["ELEMENT_ID"] == 0){
         $disabled = '';
     }else{
         $disabled = 'disabled';

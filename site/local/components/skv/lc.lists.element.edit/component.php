@@ -416,7 +416,7 @@ if($arParams["USER_TYPE"] == "user"){
     echo '</pre>';
     echo '$arResult["DOCUMENT_CREATOR"] ' . $arResult["DOCUMENT_CREATOR"] . '$current_user_id ' . $current_user_id;*/
 
-    if(empty($arResult["DOCUMENT_EDIT_AVAILABLE"]) && $arResult["DOCUMENT_CREATOR"] != $current_user_id){
+    if(empty($arResult["DOCUMENT_EDIT_AVAILABLE"]) && $arResult["DOCUMENT_CREATOR"] != $current_user_id && $arParams["ELEMENT_ID"] != 0){
         exit("У Вас нет доступа к данному документу.");
     }
 }
@@ -436,8 +436,8 @@ if(
 		)*/
 	)
     && (
-        // ИЗМЕНЯТЬ ФОРМУ МОЖЕТ ТОЛЬКО АДМИН, СОЗДАТЕЛЬ И ПРОСТОЙ ПОЛЬЗОВАТЕЛЬ С ПРАВАМИ НА ИЗМЕНЕНИЕ
-        $arParams["USER_TYPE"] == "admin" || $arResult["DOCUMENT_EDIT_AVAILABLE"] == "Y" || $arResult["DOCUMENT_CREATOR"] == $USER->GetID()
+        // ИЗМЕНЯТЬ ФОРМУ МОЖЕТ ТОЛЬКО АДМИН, СОЗДАТЕЛЬ И ПРОСТОЙ ПОЛЬЗОВАТЕЛЬ С ПРАВАМИ НА ИЗМЕНЕНИЕ ИЛИ НОВЫЙ ДОКУМЕНТ
+        $arParams["USER_TYPE"] == "admin" || $arResult["DOCUMENT_EDIT_AVAILABLE"] == "Y" || $arResult["DOCUMENT_CREATOR"] == $USER->GetID() || $arParams["ELEMENT_ID"] == 0
     )
 )
 {

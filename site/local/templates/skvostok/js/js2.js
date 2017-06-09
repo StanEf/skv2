@@ -1,7 +1,14 @@
 "use strict";
-angular.module("website.core.settings", ["ng"]), angular.module("website.core.dependency", ["website.core.settings"]), angular.module("website", ["core.library.jsonrpc", "website.core", "website.widgets", "website.plugins", "website.moto_link", "moto.validation"]).run(["jsonrpc", function (a) {
+angular.module("website.core.settings", ["ng"]),
+    angular.module("website.core.dependency", ["website.core.settings"]),
+    angular.module("website", ["core.library.jsonrpc", "website.core", "website.widgets", "website.plugins", "website.moto_link", "moto.validation"]).run(["jsonrpc", function (a) {
     window.websiteConfig && window.websiteConfig.apiUrl ? a.setBasePath(websiteConfig.apiUrl) : a.setBasePath("/api.php")
-}]), angular.module("website.widgets", ["website.widget.contact_form", "website.widget.mail_chimp", "website.widget.auth_form", "website.widget.slider", "website.widget.grid_gallery", "website.widget.carousel", "website.widget.disqus", "website.widget.facebook_page_plugin", "website.widget.twitter", "website.widget.pinterest", "website.widget.menu", "website.widget.audio_player", "website.widget.video_player", "website.widget.map"]), angular.module("website.plugins", []), angular.module("website.core", ["website.core.settings", "website.core.dependency"]), angular.module("website.core").config(["motoWebsiteSettingsServiceProvider", function (a) {
+}]),
+    angular.module("website.widgets", ["website.widget.contact_form", "website.widget.mail_chimp", "website.widget.auth_form", "website.widget.slider", "website.widget.grid_gallery", "website.widget.carousel", "website.widget.disqus", "website.widget.facebook_page_plugin", "website.widget.twitter", "website.widget.pinterest", "website.widget.menu", "website.widget.audio_player", "website.widget.video_player", "website.widget.map"]),
+
+    angular.module("website.plugins", []),
+    angular.module("website.core", ["website.core.settings", "website.core.dependency"]),
+    angular.module("website.core").config(["motoWebsiteSettingsServiceProvider", function (a) {
     window.websiteConfig && angular.isObject(window.websiteConfig) && a.set(window.websiteConfig)
 }]), $(document).ready(function () {
     var a = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -22,6 +29,7 @@ angular.module("website.core.settings", ["ng"]), angular.module("website.core.de
 
             var f = angular.element(a), g = null, h = null;
             c.toTop = function () {
+                console.log('toTop');
                 try {
                     $("body,html").animate({scrollTop: 0}, b.animationTime)
                 } catch (a) {
@@ -570,7 +578,8 @@ angular.module("website.core.settings", ["ng"]), angular.module("website.core.de
             b.bxSlider(d(e))
         }
     }
-}), angular.module("website.widget.twitter", ["website.core", "website.widget.twitter.time_line"]), angular.module("website.widget.twitter.time_line", ["ng"]).directive("motoWidgetTwitterTimeLine", ["motoDependencyService", function (a) {
+}),
+    angular.module("website.widget.twitter", ["website.core", "website.widget.twitter.time_line"]), angular.module("website.widget.twitter.time_line", ["ng"]).directive("motoWidgetTwitterTimeLine", ["motoDependencyService", function (a) {
     return {
         restrict: "AC", link: function (b, c, d) {
             try {
@@ -579,7 +588,9 @@ angular.module("website.core.settings", ["ng"]), angular.module("website.core.de
             }
         }
     }
-}]), angular.module("website.widget.video_player", ["website.core"]).directive("motoWidgetVideoPlayer", ["$rootScope", function (a) {
+}])
+
+    angular.module("website.widget.video_player", ["website.core"]).directive("motoWidgetVideoPlayer", ["$rootScope", function (a) {
     return {
         restrict: "AC", link: function (b, c) {
             var d;
@@ -601,5 +612,6 @@ angular.module("website.core.settings", ["ng"]), angular.module("website.core.de
             }), !a.isAnyAutoPlayStarted && d.data("autoplay") && (a.isAnyAutoPlayStarted = !0, d[0].player.play())
         }
     }
-}]);
+}])
+;
 console.log(angular);
